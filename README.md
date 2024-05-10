@@ -1,1 +1,1 @@
-# solution-of-query-string-attack
+# Solution of Query string attack (Sorgu dizisi saldırısı Çözümü)
