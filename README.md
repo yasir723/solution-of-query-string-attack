@@ -156,63 +156,132 @@ if (!empty($userName) and !empty($password)) {
 
 Böylece kullanıcı `Hareketlerim` butonuna tıkladığı zaman gönderilecek bilgi userName yerine userToken gönderilecektir. Şimdi bu bilgiyi kullanacak kod `myActivities.php` userName alan yerinde userToken almasını yazmamız gerek, güncellenecek kod bu şekilde:
 
-```php
-<?php
-//Database Authentication
-require("DBInfo.php");
+```html
+<?php require 'headerTab.php' ?>
 
-$userName = $_GET['userName'];
+<body style="font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">
+    <div class="container" style="width: 50%; margin-left:auto;margin-right: auto;font-size: 15px;">
+        </br>
+        </br>
+        </br>
+        <form id='login' action="myActivities.php?userName=<?= $_GET['userName']; ?>" method='post' accept-charset='UTF-8'>
+            <div class="panel">
+                <div class="panel-heading" style="background-color:#280f4d; color:#fff">Para Gönderme</div>
+                <div class="panel-body">
+                    <div class="form-group">
+                        <label for='ToUserName'>Alıcının Kullanıcı Adı:</label>
+                        <input type='text' name='ToUserName' class="form-control" id='ToUserName' maxlength="50" required />
+                        <label for='Amount'>Miktar:</label>
+                        <input type='text' name='Amount' class="form-control" id='Amount' maxlength="50" required />
+                        <input type="hidden" name="fromUserName" value="<?= $_GET['userName']; ?>" />
 
-//connect to database
-$connect = mysqli_connect($hostDB, $userDB, $passwordDB, $databaseDB);
-if (mysqli_connect_errno()) {
-    die(" cannot connect to database " . mysqli_connect_error());
-}
+                        <input type='submit' style="font-size: 20px; padding-left:15px; padding-right:15px; background-color:#280f4d; color:#fff" class="btn btn-success" name='Submit' id='submit' value='Gönder' />
+                    </div>
+                </div>
+            </div>
+
+        </form>
+
+        <h1> Hareketler</h1>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <td> Transfer Anahtarı </td>
+                    <td> Gönderici </td>
+                    <td> Alıcı</td>
+                    <td> Miktar</td>
+                </tr>
+            </thead>
+            <tbody>
 
 
-//Add new Activitiy
-if (!empty($_POST['fromUserName']) and !empty($_POST['ToUserName'])) {
 
-    $query = "insert into activities(fromUserName,ToUserName,Amount)
-    values ('" . $_POST['fromUserName'] . "','" . $_POST['ToUserName'] . "'," . $_POST['Amount'] . ")";
+                <?php
+                //Database Authentication
+                require("DBInfo.php");
 
-    $result = mysqli_query($connect, $query);
-    if (!$result) {
-        die(' Error cannot run query');
-    }
-}
+                $userName = $_GET['userName'];
 
-// get user activities
-if (!empty($userName)) {
-    $query = "select * from activities  where fromUserName='" . $userName . "' or ToUserName='" . $userName . "'";
-    $result = mysqli_query($connect, $query);
-    if (!$result) {
-        die(' Error cannot run query');
-    }
+                //connect to database
+                $connect = mysqli_connect($hostDB, $userDB, $passwordDB, $databaseDB);
+                if (mysqli_connect_errno()) {
+                    die(" cannot connect to database " . mysqli_connect_error());
+                }
 
-    $userInfo = array();
-    $loginInUser = null;
-    while ($row = mysqli_fetch_assoc($result)) {
-        $rowColor = "class='success'";
-        if ($row["fromUserName"] == $userName) {
-            $rowColor = "class='danger'";
-        }
-        echo " <tr " . $rowColor . ">";
-        echo " <td>" . $row["transactionKey"] . " </td>";
-        echo " <td>" . $row["fromUserName"] . " </td>";
-        echo "  <td>" . $row["ToUserName"] . "</td>";
-        echo " <td>" . $row["Amount"] . "</td>";
-        echo " </tr>";
-    }
-    mysqli_free_result($result);
-}
-mysqli_close($connect);
-?>
+
+                //Add new Activitiy
+                if (!empty($_POST['fromUserName']) and !empty($_POST['ToUserName'])) {
+
+                    $query = "insert into activities(fromUserName,ToUserName,Amount)
+                    values ('" . $_POST['fromUserName'] . "','" . $_POST['ToUserName'] . "'," . $_POST['Amount'] . ")";
+
+                    $result = mysqli_query($connect, $query);
+                    if (!$result) {
+                        die(' Error cannot run query');
+                    }
+                }
+
+                // get user activities
+                if (!empty($userName)) {
+                    $query = "select * from activities  where fromUserName='" . $userName . "' or ToUserName='" . $userName . "'";
+                    $result = mysqli_query($connect, $query);
+                    if (!$result) {
+                        die(' Error cannot run query');
+                    }
+
+                    $userInfo = array();
+                    $loginInUser = null;
+                    while ($row = mysqli_fetch_assoc($result)) {
+                        $rowColor = "class='success'";
+                        if ($row["fromUserName"] == $userName) {
+                            $rowColor = "class='danger'";
+                        }
+                        echo " <tr " . $rowColor . ">";
+                        echo " <td>" . $row["transactionKey"] . " </td>";
+                        echo " <td>" . $row["fromUserName"] . " </td>";
+                        echo "  <td>" . $row["ToUserName"] . "</td>";
+                        echo " <td>" . $row["Amount"] . "</td>";
+                        echo " </tr>";
+                    }
+                    mysqli_free_result($result);
+                }
+                mysqli_close($connect);
+                ?>
+
+            </tbody>
+        </table>
+    </div>
+</body>
+<?php require 'footerTab.php' ?>
 ```
 
-3. adım olarak `GET` olarak paramatreyi alan komutu güncellemek:
+3. adım olarak `GET` olarak userToken parametresini alan komutlarda güncellemek:
+```hmtl
+<label for='ToUserName'>Alıcının Kullanıcı Adı:</label>
+<input type='text' name='ToUserName' class="form-control" id='ToUserName' maxlength="50" required />
+<label for='Amount'>Miktar:</label>
+<input type='text' name='Amount' class="form-control" id='Amount' maxlength="50" required />
+<input type="hidden" name="fromUserName" value="<?= $_GET['userToken']; ?>" />
+```
+
+4. adım olarak `PHP` kodundaki `GET` olarak userToken parametresini alan komutlarda güncellemek:
 ```php
 $userToken = $_GET['userToken'];
+```
+
+bu adımda userToken bilgisini aldıktan sonra onu kullanarak kullanıcıya ait userName bilgisine ulaşmam gerek bu yüzden kodumuza bu kodu ekleyeceğiz:
+```php
+//get user name from token
+$query = "select userName from login  where userToken='" . $userToken . "'";
+$result = mysqli_query($connect, $query);
+if (!$result) {
+    die(' Error cannot run query');
+}
+$userName = null;
+while ($row = mysqli_fetch_assoc($result)) {
+    $userName = $row["userName"];
+    break; // to be save
+}
 ```
 
 
