@@ -269,7 +269,7 @@ Böylece kullanıcı `Hareketlerim` butonuna tıkladığı zaman gönderilecek b
 $userToken = $_GET['userToken'];
 ```
 
-bu adımda userToken bilgisini aldıktan sonra onu kullanarak kullanıcıya ait userName bilgisine ulaşmam gerek bu yüzden kodumuza bu kodu ekleyeceğiz:
+bu adımda userToken bilgisini aldıktan sonra onu kullanarak kullanıcıya ait userName bilgisine ulaşmam gerek bu yüzden kodumuza bu kod parçacığı ekleyeceğiz:
 ```php
 //get user name from token
 $query = "select userName from login  where userToken='" . $userToken . "'";
