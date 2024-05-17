@@ -2,26 +2,30 @@
 Bu saldırıyı [anlatım sayfası](https://github.com/yasir723/query-string-attack)nda gördüğümüz gibi, hackerlar olarak URL'deki parametreleri kullanarak hassas bilgileri ele geçirip oturum çalabildiğimizi öğrendik. Bu sayfada, geliştirici olarak bu tür saldırılardan sistemimizi nasıl koruyabileceğimizi öğreneceğiz. Öncelikle, hiçbir durumda hassas bilgileri URL ile göndermemeliyiz ki bu ciddi bir güvenlik açığı oluşturur. İleri saldırılarda, hassas bilgilerin güvenli bir şekilde nasıl gönderilmesi gerektiği anlatılmıştır. Ancak bu sayfada, eğer hassas bilgileri göndermemiz gerekirse, bunu nasıl güvenli hale getirebileceğimiz üzerinde duracağız.
 
 
-Giriş yapıp hareketler sayfasına gittiğimizde urlde userName parametresini gönderiyoruz bu aşağıdaki fotoğrafta göreceğiz:
+Örnek olarak kullandığımız web sitede giriş yaptıktan sonra hareket sayfasına gittiğimizde URL'de `userName` biglisini parametre olarak iletildiğini farkedeceğiz:
 
 <div align="center">
     <img src="https://github.com/yasir723/solution-of-query-string-attack/assets/111686779/8830758a-edfc-4459-89b5-119a5b5af204">
 </div>
 
-ancak userName genellikle kolay tahmin edilebilen bir terimdir bu yüzden kullanıcıya ait userToken gibi zor tahmin edilebilen bir terim parametre olarak göndermemiz gerek, ardından bu parametreyi sunucu tarafında kullanarak kullanıcının userName özelliğini ulaşırız.
+`userName` genellikle kolay tahmin edilebilen bir terimdir. Bu nedenle, kullanıcının kimliğini belirlemek için `userToken` gibi zor tahmin edilebilen bir terimi parametre olarak göndermek daha güvenlidir. Daha sonra, bu parametreyi sunucu tarafında kullanarak kullanıcının `userName` özelliğine erişebiliriz.
 
-UserToken: genellikle kullanıcı oturumlarını yönetmek için kullanılan bir kimlik belgesidir. Rasgele oluşturulur ve kullanıcının kimliğini doğrulamak için sunucu tarafından kullanılır.
+`UserToken:` genellikle kullanıcı oturumlarını yönetmek için kullanılan bir kimlik belgesidir. Rasgele oluşturulur ve kullanıcının kimliğini doğrulamak için sunucu tarafından kullanılır.
 <div align="center">
     <img src="https://github.com/yasir723/solution-of-query-string-attack/assets/111686779/71eeb696-de95-4f33-b1fd-8d18bea3b766">
 </div>
 
-veritabanındaki kullanıcı tablosuna bakarasak bu şekilde göreceğiz:
+Veritabanındaki kullanıcı tablosuna baktığımızda verileri bu şekilde göreceğiz:
+
 <div align="center">
     <img src="https://github.com/yasir723/solution-of-query-string-attack/assets/111686779/8d46b241-825c-4941-8740-3b7e674b8473">
 </div>
 
 
-işte userToken gibi bilgisi zor tahmin edilen bir terim olduğu için bu şekilde kullanarabiliriz ancak güvenlik açısından en iyi yöntem değildir. kullanıcı kimliğini doğrulamak için kullandığımız sunucu tarafındaki kod `login.php sayfası` bu şekilde username parametre olarak gönderiyoruz:
+Kullanıcı tablosuna baktığımızda, userToken gibi tahmin edilmesi zor bir terim kullanarak güvenlik önlemlerini artırabiliriz. Ancak, bu yöntem, tam anlamıyla güvenlik sağlamak için yeterli değildir.
+
+
+Kullanıcı kimliğini doğrulamak için sunucu tarafındaki kod, `login.php`:
 ```php
 <?php
 //Database Authentication
@@ -79,9 +83,10 @@ if(!empty($userName) and !empty($password)) {
 
 ?>
 ```
+Bu koda dikkat ettiğimizde, `Hareketler` butonuna tıklandığında, `userName` parametresini göndererek kullanıcı kimliğini iletir. Ancak `userToken` daha zor tahmin edilmesi açıcından `userName` yerine `userToken` göndermek istiyoruz, bu nedenle `userName` olarak belirtilen her yeri `userToken` olarak değiştireceğiz.
 
-Ancak biz userName yerine userToken göndermek istiyoruz bu yüzden userName yazılan yerlere userToken yazacağız
-ilk adım olarak giriş yapmış olan kullanıcının userName bilgisi değil, userToken bilgisini bir değişkene atarız
+İlk adım olarak, giriş yapan kullanıcının `userName` bilgisi yerine userToken bilgisini bir değişkene atarız
+
 ```php
 $userToken=null;
 while ($row= mysqli_fetch_assoc($result)) {
@@ -89,7 +94,9 @@ while ($row= mysqli_fetch_assoc($result)) {
     break; // to be save
 }
 ```
-2. adım olarak başarılı bir giriş yapıldıysa ayrı bir değişkene atadığımız userToken bilgisini `Hareketlerim` butonuna tıklandığında kullanıcı yönlendirilecek linkte parametre olarak gönderilen bilgilerde düzeltmemiz gerekiyor, userName yerine userToken göndermemiz gerek.
+
+2. adım olarak Başarılı bir girişin ardından, kullanıcının `Hareketlerim` butonuna tıkladığında yönlendirileceği linkte, `userName` yerine `userToken` parametresini kullanmamız gerekiyor. Bu nedenle, doğru bir şekilde kullanmak için kullanıcıya ait `userToken`'ı kullanacağız.
+
 ```php
 if (!empty($userToken)) {
     echo "</br><div class=\"alert\" style=\"background-color:#68479d; color: white;font-weight: bold;\" >Veritabanı Bildirimi: Giriş Başarılı - Kullanıcı Adı: (" . $userName . ")";
@@ -101,7 +108,7 @@ if (!empty($userToken)) {
 echo "</pre>";
 ```
 
-`login.php` sayfası güncel kodu bu şekilde olacaktır:
+Tam olarak `login.php` sayfası güncel kodu bu şekilde olacaktır:
 ```php
 <?php
 //Database Authentication
@@ -156,7 +163,7 @@ if (!empty($userName) and !empty($password)) {
 ```
 
 
-Böylece kullanıcı `Hareketlerim` butonuna tıkladığı zaman gönderilecek bilgi userName yerine userToken gönderilecektir. Şimdi bu bilgiyi kullanacak kod `myActivities.php` userName alan yerinde userToken almasını yazmamız gerek, güncellenecek kod bu şekilde:
+Kullanıcı `Hareketlerim` butonuna tıkladığında, artık `userName` yerine `userToken` bilgisi gönderilecektir. Bu bilgiyi kullanacak olan `myActivities.php` dosyasını da güncellememiz gerekiyor. Kodun güncellenmiş hali şu şekilde olmalıdır:
 
 ```php
 <?php require 'headerTab.php' ?>
@@ -257,7 +264,8 @@ Böylece kullanıcı `Hareketlerim` butonuna tıkladığı zaman gönderilecek b
 <?php require 'footerTab.php' ?>
 ```
 
-3. adım olarak `GET` olarak userToken parametresini alan komutlarda güncellemek:
+3. adım olarak, html kodundaki `userName` parametresini `GET` olarak alan komutları `userToken` olarak güncellemek:
+
 ```hmtl
 <label for='ToUserName'>Alıcının Kullanıcı Adı:</label>
 <input type='text' name='ToUserName' class="form-control" id='ToUserName' maxlength="50" required />
@@ -266,12 +274,13 @@ Böylece kullanıcı `Hareketlerim` butonuna tıkladığı zaman gönderilecek b
 <input type="hidden" name="fromUserName" value="<?= $_GET['userToken']; ?>" />
 ```
 
-4. adım olarak `PHP` kodundaki `GET` olarak userToken parametresini alan komutlarda güncellemek:
+4. aadım olarak, PHP kodundaki `userName` parametresini `GET` olarak alan komutları `userToken` olarak güncellemek:
 ```php
 $userToken = $_GET['userToken'];
 ```
 
-bu adımda userToken bilgisini aldıktan sonra onu kullanarak kullanıcıya ait userName bilgisine ulaşmam gerek bu yüzden kodumuzda userToken bilgisini ve veritabanına bağlandıktan sonra bu kod parçacığı ekleyeceğiz:
+Bu adımda, userToken bilgisini aldıktan sonra, bu bilgiyi kullanarak kullanıcıya ait userName bilgisine ulaşmamız gerekiyor. Çünkü işlemlerimizde userName bilgisine ihtiyaç duyuyoruz. Bu yüzden, userToken bilgisini aldıktan ve veritabanına bağlandıktan sonra aşağıdaki kod parçacığını eklememiz gerekiyor:
+
 ```php
 //get user name from token
 $query = "select userName from login  where userToken='" . $userToken . "'";
@@ -286,7 +295,7 @@ while ($row = mysqli_fetch_assoc($result)) {
 }
 ```
 
-bu durumda giriş yapmak istediğimizde URL'deki gönderilen parametreleri bu şekilde göreceğiz
+Son olarak, giriş yaptığımızda URL'de gönderilen parametreleri şu şekilde göreceğiz:
 
 <div align="center">
     <img src="https://github.com/yasir723/solution-of-query-string-attack/assets/111686779/71eeb696-de95-4f33-b1fd-8d18bea3b766">
@@ -294,6 +303,6 @@ bu durumda giriş yapmak istediğimizde URL'deki gönderilen parametreleri bu ş
 
 
 
-
+Bu şekilde hassas bilgileri sorgu olarak ileterek sistemi daha güvenli hale getirmiş olduk.
 
 
