@@ -1,5 +1,6 @@
 # Solution of Query string attack (Sorgu dizisi saldırısı Çözümü)
-Bu saldırıyı anlatım sayfasında gördüğümüz gibi hackerler olarak hassas bilgileri url ile parametre olarak gönderilen bilgileri kullanarak nasıl oturum çalabildiğimizi öğrendik ancak bu sayfada geliştirici olarak bu saldırdan geliştirdiğimiz sistemi nasıl kuruyabileceğimizi öğreneceğiz, öncellikle hiçbir durum bizi hassas bilgileri url ile göndermemize zorunda bırakamaz, zira hassa bilgileri asla url ile gönderilmemesi gerek. ileri saldırılarda hassas bilgilerde güvenli bir şekilde nasıl göndeirlmesi gerektiğini anlatılmıştır. ancak bu sayfada eğer göndermek istiyorsak bu şekilde bir yaklaşım kullanabiliriz. 
+Bu saldırıyı [anlatım sayfası](https://github.com/yasir723/query-string-attack)nda gördüğümüz gibi, hackerlar olarak URL'deki parametreleri kullanarak hassas bilgileri ele geçirip oturum çalabildiğimizi öğrendik. Bu sayfada, geliştirici olarak bu tür saldırılardan sistemimizi nasıl koruyabileceğimizi öğreneceğiz. Öncelikle, hiçbir durumda hassas bilgileri URL ile göndermemeliyiz ki bu ciddi bir güvenlik açığı oluşturur. İleri saldırılarda, hassas bilgilerin güvenli bir şekilde nasıl gönderilmesi gerektiği anlatılmıştır. Ancak bu sayfada, eğer hassas bilgileri göndermemiz gerekirse, bunu nasıl güvenli hale getirebileceğimiz üzerinde duracağız.
+
 
 Giriş yapıp hareketler sayfasına gittiğimizde urlde userName parametresini gönderiyoruz bu aşağıdaki fotoğrafta göreceğiz:
 
