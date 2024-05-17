@@ -11,13 +11,14 @@ ancak userName genellikle kolay tahmin edilebilen bir terimdir bu yüzden kullan
 
 UserToken: genellikle kullanıcı oturumlarını yönetmek için kullanılan bir kimlik belgesidir. Rasgele oluşturulur ve kullanıcının kimliğini doğrulamak için sunucu tarafından kullanılır.
 <div align="center">
-    <img src="https://github.com/yasir723/giris-dogrulamanin-atlatilmasi-ve-kisitlamalarin-asilmasi-cozumu/assets/111686779/8a90127b-3a3b-48d3-a9d0-8c793164164a">
+    <img src="https://github.com/yasir723/solution-of-query-string-attack/assets/111686779/71eeb696-de95-4f33-b1fd-8d18bea3b766">
 </div>
 
 veritabanındaki kullanıcı tablosuna bakarasak bu şekilde göreceğiz:
 <div align="center">
-    <img src="https://github.com/yasir723/giris-dogrulamanin-atlatilmasi-ve-kisitlamalarin-asilmasi-cozumu/assets/111686779/8a90127b-3a3b-48d3-a9d0-8c793164164a">
+    <img src="https://github.com/yasir723/solution-of-query-string-attack/assets/111686779/8d46b241-825c-4941-8740-3b7e674b8473">
 </div>
+
 
 işte userToken gibi bilgisi zor tahmin edilen bir terim olduğu için bu şekilde kullanarabiliriz ancak güvenlik açısından en iyi yöntem değildir. kullanıcı kimliğini doğrulamak için kullandığımız sunucu tarafındaki kod `login.php sayfası` bu şekilde username parametre olarak gönderiyoruz:
 ```php
@@ -143,7 +144,7 @@ if (!empty($userName) and !empty($password)) {
     echo "query: " . $query . "</br>";
     if (!empty($userToken)) {
         echo "</br><div class=\"alert\" style=\"background-color:#68479d; color: white;font-weight: bold;\" >Veritabanı Bildirimi: Giriş Başarılı - Kullanıcı Adı: (" . $userName . ")";
-        echo "</br></br><a class=\"btn \" style=\"background-color:#280F4D; color: white;font-weight: bold;\" href='myActivities.php?userName=" . $userToken . "'> Hareketlerim</a>";
+        echo "</br></br><a class=\"btn \" style=\"background-color:#280F4D; color: white;font-weight: bold;\" href='myActivities.php?userToken=" . $userToken . "'> Hareketlerim</a>";
         echo "</div>";
     } else {
         echo "</br><div class=\"alert alert-danger\">Database Message: Fail login</div>";
@@ -156,7 +157,7 @@ if (!empty($userName) and !empty($password)) {
 
 Böylece kullanıcı `Hareketlerim` butonuna tıkladığı zaman gönderilecek bilgi userName yerine userToken gönderilecektir. Şimdi bu bilgiyi kullanacak kod `myActivities.php` userName alan yerinde userToken almasını yazmamız gerek, güncellenecek kod bu şekilde:
 
-```html
+```php
 <?php require 'headerTab.php' ?>
 
 <body style="font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">
@@ -269,7 +270,7 @@ Böylece kullanıcı `Hareketlerim` butonuna tıkladığı zaman gönderilecek b
 $userToken = $_GET['userToken'];
 ```
 
-bu adımda userToken bilgisini aldıktan sonra onu kullanarak kullanıcıya ait userName bilgisine ulaşmam gerek bu yüzden kodumuza bu kod parçacığı ekleyeceğiz:
+bu adımda userToken bilgisini aldıktan sonra onu kullanarak kullanıcıya ait userName bilgisine ulaşmam gerek bu yüzden kodumuzda userToken bilgisini ve veritabanına bağlandıktan sonra bu kod parçacığı ekleyeceğiz:
 ```php
 //get user name from token
 $query = "select userName from login  where userToken='" . $userToken . "'";
@@ -283,6 +284,15 @@ while ($row = mysqli_fetch_assoc($result)) {
     break; // to be save
 }
 ```
+
+bu durumda giriş yapmak istediğimizde URL'deki gönderilen parametreleri bu şekilde göreceğiz
+
+<div align="center">
+    <img src="https://github.com/yasir723/solution-of-query-string-attack/assets/111686779/71eeb696-de95-4f33-b1fd-8d18bea3b766">
+</div>
+
+
+
 
 
 
