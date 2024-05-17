@@ -266,7 +266,7 @@ Kullanıcı `Hareketlerim` butonuna tıkladığında, artık `userName` yerine `
 
 3. adım olarak, html kodundaki `userName` parametresini `GET` olarak alan komutları `userToken` olarak güncellemek:
 
-```hmtl
+```php
 <label for='ToUserName'>Alıcının Kullanıcı Adı:</label>
 <input type='text' name='ToUserName' class="form-control" id='ToUserName' maxlength="50" required />
 <label for='Amount'>Miktar:</label>
